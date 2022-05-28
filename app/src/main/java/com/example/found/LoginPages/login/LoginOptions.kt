@@ -17,10 +17,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.found.LoginNavigation.Screen
 import kotlin.math.round
 
 @Composable
-fun LoginOptions() {
+fun LoginOptions(navHostController: NavHostController) {
     Column(modifier = Modifier
         .fillMaxSize()
         .background(Color(0xFF78B3B3))) {
@@ -76,7 +79,7 @@ fun LoginOptions() {
 
                 }
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = { navHostController.navigate(route = Screen.EnterUserDetails.route) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(60.dp),
@@ -99,5 +102,6 @@ fun LoginOptions() {
 @Preview(showBackground = true)
 @Composable
 fun preview() {
-    LoginOptions()
+    val rember= rememberNavController()
+    LoginOptions(rember)
 }

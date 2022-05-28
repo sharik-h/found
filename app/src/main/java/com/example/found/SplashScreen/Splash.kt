@@ -1,6 +1,7 @@
 package com.example.found.SplashScreen
 
 
+import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -30,6 +31,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.found.LoginNavigation.Screen
 import com.example.found.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 
 @Composable
@@ -44,7 +48,14 @@ fun Splash(navHostController: NavHostController) {
         startAnimation = true
         delay(2000)
         navHostController.popBackStack()
-        navHostController.navigate(Screen.search.route)
+        val user = FirebaseAuth.getInstance().currentUser?.uid
+        if (user != null) {
+            Log.d("logged",user.toString())
+            navHostController.navigate(Screen.search.route)
+        }else{
+            Log.d("logged",user.toString())
+            navHostController.navigate(Screen.loginOptions.route)
+        }
     }
     SplashPreview(alpha = alphaanim.value)
 }

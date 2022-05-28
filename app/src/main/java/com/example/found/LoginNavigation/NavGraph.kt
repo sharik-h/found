@@ -5,6 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.found.LoginPages.CreateAccount.EnterUserDetails
+import com.example.found.LoginPages.login.LoginOptions
 import com.example.found.SearchPage.Searchpage
 import com.example.found.SplashScreen.Splash
 
@@ -19,6 +21,12 @@ fun NavGraph(navHostController: NavHostController) {
         }
         composable(route = Screen.search.route){
             Searchpage()
+        }
+        composable(route = Screen.loginOptions.route){
+            LoginOptions(navHostController = navHostController  )
+        }
+        composable(route = Screen.EnterUserDetails.route) {
+            EnterUserDetails(navHostController = navHostController)
         }
     }
 }

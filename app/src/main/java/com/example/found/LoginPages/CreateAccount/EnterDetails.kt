@@ -1,5 +1,6 @@
 package com.example.found.LoginPages.CreateAccount
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -7,14 +8,20 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.found.LoginPages.Auth.Authenticate
 
 
 @Composable
-fun EnterUserDetails() {
+fun EnterUserDetails(navHostController: NavHostController) {
+
+    val context = LocalContext.current
 
     var name by remember{ mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
@@ -34,7 +41,13 @@ fun EnterUserDetails() {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick ={
+                        context.startActivity(Intent(context, Authenticate::class.java)
+                            .putExtra("name",name)
+                            .putExtra("phone",phone)
+                            .putExtra("password", password))
+
+                             },
                     modifier = Modifier.height(50.dp),
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
@@ -113,5 +126,6 @@ fun EnterUserDetails() {
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
-    EnterUserDetails()
+    val rem = rememberNavController()
+    EnterUserDetails(rem)
 }
