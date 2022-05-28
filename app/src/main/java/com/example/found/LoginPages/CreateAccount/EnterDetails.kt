@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -81,6 +82,10 @@ fun EnterUserDetails(navHostController: NavHostController) {
                 fontWeight = FontWeight.Bold
             )
             TextField(
+                textStyle = TextStyle(
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold),
                 value = name,
                 onValueChange = { it -> name = it },
                 colors = TextFieldDefaults.textFieldColors(
@@ -96,6 +101,10 @@ fun EnterUserDetails(navHostController: NavHostController) {
                 fontWeight = FontWeight.Bold
             )
             TextField(
+                textStyle = TextStyle(
+                color = Color.White,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold),
                 value = phone,
                 onValueChange = { it -> phone = it },
                 colors = TextFieldDefaults.textFieldColors(
@@ -110,6 +119,10 @@ fun EnterUserDetails(navHostController: NavHostController) {
                 color = Color.White
             )
             TextField(
+                textStyle = TextStyle(
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold),
                 value = password,
                 onValueChange = { it -> password = it },
                 colors = TextFieldDefaults.textFieldColors(

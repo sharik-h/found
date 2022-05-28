@@ -47,7 +47,7 @@ fun Searchpage() {
                 fontSize = 30.sp
             )
             TextButton(onClick = { /*TODO*/ }) {
-                val usericon: Painter = painterResource(id = R.drawable.logo)
+                val usericon: Painter = painterResource(id = R.drawable.user_icon)
                 Image(painter = usericon, contentDescription = "", modifier = Modifier.size(40.dp))
             }
         }
