@@ -1,5 +1,6 @@
 package com.example.found.LoginPages.login
 
+import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,9 +10,8 @@ import androidx.compose.material.ButtonDefaults.buttonColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.found.LoginNavigation.Screen
+import com.example.found.LoginPages.LoginWith.LoginWithGoogle
 import kotlin.math.round
 
 @Composable
@@ -62,8 +63,11 @@ fun LoginOptions(navHostController: NavHostController) {
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
+                val context = LocalContext.current
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        context.startActivity(Intent(context, LoginWithGoogle::class.java))
+                              },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(60.dp),

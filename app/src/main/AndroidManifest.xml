@@ -21,6 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".LoginPages.Auth.Authenticate" />
+        <activity android:name=".LoginPages.LoginWith.LoginWithGoogle" android:theme="@style/Theme.Transparent"/>
     </application>
 
 </manifest>
