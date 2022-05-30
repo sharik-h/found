@@ -10,8 +10,10 @@ import androidx.compose.material.ButtonDefaults.buttonColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,13 +23,20 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.found.LoginNavigation.Screen
 import com.example.found.LoginPages.LoginWith.LoginWithGoogle
+import com.example.found.R
 import kotlin.math.round
 
 @Composable
 fun LoginOptions(navHostController: NavHostController) {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(Color(0xFF78B3B3))) {
+
+    var gclick = false
+    var text = "Continue with google"
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF78B3B3))
+    ) {
         TopAppBar(
             backgroundColor = Color.Transparent,
             elevation = 0.dp,
@@ -64,33 +73,22 @@ fun LoginOptions(navHostController: NavHostController) {
                     color = Color.White
                 )
                 val context = LocalContext.current
-                Button(
-                    onClick = {
-                        context.startActivity(Intent(context, LoginWithGoogle::class.java))
-                              },
+                GoogleButton(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(60.dp),
-                    shape = RoundedCornerShape(50),
-                    colors = buttonColors(backgroundColor = Color.White)
-                ) {
-                    Text(
-                        text = "Continue with google",
-                        color = Color(0xFF78B3B3),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 23.sp
-                    )
-
-                }
+                        .height(50.dp)
+                        .padding(horizontal = 20.dp)
+                        .clip(RoundedCornerShape(50)),
+                ) { context.startActivity(Intent(context, LoginWithGoogle::class.java))}
                 Button(
                     onClick = { navHostController.navigate(route = Screen.EnterUserDetails.route) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(60.dp),
+                        .height(50.dp)
+                        .padding(horizontal = 20.dp),
                     colors = buttonColors(backgroundColor = Color.Transparent),
                     shape = RoundedCornerShape(50),
-
-                    ) {
+                ) {
                     Text(
                         text = "Create Acccount",
                         fontSize = 23.sp,
