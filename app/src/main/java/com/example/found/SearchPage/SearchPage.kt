@@ -1,16 +1,15 @@
 package com.example.found.SearchPage
 
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -23,11 +22,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.found.Maps.MapsActivity
 import com.example.found.R
-
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 
 @Composable
 fun Searchpage() {
+
+
+    val openDialog = remember { mutableStateOf(false)  }
+    showAlertDailogue(openDialog = openDialog)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,7 +62,9 @@ fun Searchpage() {
 
         val context = LocalContext.current
         TextButton(
-            onClick = { context.startActivity(Intent(context, MapsActivity::class.java))},
+            onClick = {
+                openDialog.value = true
+            },
             modifier = Modifier.size(90.dp)) {
             Image(
                 imageVector = Icons.Default.AddCircle,
@@ -67,6 +74,51 @@ fun Searchpage() {
                     .padding(5.dp) )
         }
     }
+}
+
+@Composable
+fun showAlertDailogue(openDialog: MutableState<Boolean>) {
+    var name by remember { mutableStateOf("") }
+    var openDialog = openDialog
+    val context = LocalContext.current
+    if (openDialog.value){
+        AlertDialog(
+            onDismissRequest = { /*TODO*/ },
+            confirmButton = {
+                Button(onClick = {
+                    if(name.length >= 1) {
+                        context.startActivity(Intent(context, MapsActivity::class.java)
+                            .putExtra("name",name))
+                        Log.d("name",name)
+                        name = ""
+                        openDialog.value = false
+                    }
+
+                }) {
+                    Text(text = "Next")
+                }
+            },
+            dismissButton = {
+                Button(onClick = {
+                    openDialog.value = false
+                    name = ""
+                }) {
+                    Text(text = "Cancel")
+                }
+            },
+            title = { Text(text = "Enter the name of location")},
+            text = {
+                TextField(
+                    value = name,
+                    onValueChange = { it -> name = it },
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent,
+                    )
+                )
+            }
+        )
+    }
+
 }
 
 @Preview(showBackground = true)
