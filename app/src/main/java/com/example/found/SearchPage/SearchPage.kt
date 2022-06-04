@@ -5,11 +5,14 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -22,17 +25,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.found.Maps.MapsActivity
 import com.example.found.R
+import com.example.found.data.firestoreViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import androidx.compose.runtime.livedata.observeAsState
+import com.google.firebase.firestore.auth.User
 
 
 @Composable
-fun Searchpage() {
-
-
+fun Searchpage(viewModel: firestoreViewModel) {
     val openDialog = remember { mutableStateOf(false)  }
     showAlertDailogue(openDialog = openDialog)
+
+    val database = Firebase.firestore
+    val currentUid = FirebaseAuth.getInstance().currentUser!!.uid
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -60,19 +68,29 @@ fun Searchpage() {
             }
         }
 
-        val context = LocalContext.current
-        TextButton(
-            onClick = {
-                openDialog.value = true
-            },
-            modifier = Modifier.size(90.dp)) {
-            Image(
-                imageVector = Icons.Default.AddCircle,
-                contentDescription = "",
-                modifier = Modifier
-                    .size(80.dp)
-                    .padding(5.dp) )
+
+        viewModel.getData()
+        val userDetails by viewModel.userDetails.observeAsState(initial = emptyList())
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+
+        ) {
+            items(items = userDetails) {
+                UserOption(ItemName = it.name.toString())
+            }
         }
+        TextButton(
+                onClick = { openDialog.value = true },
+        modifier = Modifier.size(90.dp)
+        ) {
+        Image(
+            imageVector = Icons.Default.AddCircle,
+            contentDescription = "",
+            modifier = Modifier
+                .size(80.dp)
+                .padding(5.dp)
+        )
+    }
     }
 }
 
@@ -121,8 +139,23 @@ fun showAlertDailogue(openDialog: MutableState<Boolean>) {
 
 }
 
+@Composable
+fun UserOption(
+    ItemName: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().height(30.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(text = ItemName)
+      }
+
+}
+
 @Preview(showBackground = true)
 @Composable
 fun prec() {
-    Searchpage()
+//    Searchpage()
+    UserOption(ItemName = "sharikh")
 }

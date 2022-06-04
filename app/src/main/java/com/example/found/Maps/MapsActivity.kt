@@ -104,7 +104,7 @@ class MapsActivity: ComponentActivity() {
                             "longitude" to longitude
                         )
                         database
-                            .collection("/locations/$currentUid/$name")
+                            .collection("found/locations/$currentUid")
                             .add(location)
                             .addOnSuccessListener {
                                 Log.d("dataStatus","data added successfully")

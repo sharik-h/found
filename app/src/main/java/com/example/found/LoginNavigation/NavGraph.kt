@@ -1,6 +1,7 @@
 package com.example.found.LoginNavigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.ViewModel
 
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -9,9 +10,10 @@ import com.example.found.LoginPages.CreateAccount.EnterUserDetails
 import com.example.found.LoginPages.login.LoginOptions
 import com.example.found.SearchPage.Searchpage
 import com.example.found.SplashScreen.Splash
+import com.example.found.data.firestoreViewModel
 
 @Composable
-fun NavGraph(navHostController: NavHostController) {
+fun NavGraph(navHostController: NavHostController, viewModel: firestoreViewModel) {
     NavHost(
         navController = navHostController,
         startDestination = Screen.splash.route
@@ -20,7 +22,7 @@ fun NavGraph(navHostController: NavHostController) {
             Splash(navHostController = navHostController)
         }
         composable(route = Screen.search.route){
-            Searchpage()
+            Searchpage(viewModel = viewModel)
         }
         composable(route = Screen.loginOptions.route){
             LoginOptions(navHostController = navHostController  )
