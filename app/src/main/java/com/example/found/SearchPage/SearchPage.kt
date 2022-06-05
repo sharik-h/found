@@ -7,9 +7,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,11 +26,11 @@ import androidx.compose.ui.unit.sp
 import com.example.found.Maps.MapsActivity
 import com.example.found.R
 import com.example.found.data.firestoreViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import androidx.compose.runtime.livedata.observeAsState
-import com.google.firebase.firestore.auth.User
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import com.example.found.ui.theme.*
 
 
 @Composable
@@ -38,16 +38,16 @@ fun Searchpage(viewModel: firestoreViewModel) {
     val openDialog = remember { mutableStateOf(false)  }
     showAlertDailogue(openDialog = openDialog)
 
-    val database = Firebase.firestore
-    val currentUid = FirebaseAuth.getInstance().currentUser!!.uid
+    val nunito_sans = Font(R.font.nunito_sans)
+    val nunito_bold = Font(R.font.nunito_sans_bold)
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color(0xFFFFE9FD))
+            .background(color = secondary95)
     ) {
         TopAppBar(
-            backgroundColor = Color.Transparent,
+            backgroundColor = secondary90,
             elevation = 0.5.dp,
             contentPadding = PaddingValues(start = 0.dp, end = 0.dp)
         ) {
@@ -60,6 +60,7 @@ fun Searchpage(viewModel: firestoreViewModel) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(0.5f),
                 textAlign = TextAlign.Center,
+                fontFamily = FontFamily(nunito_bold),
                 fontSize = 30.sp
             )
             TextButton(onClick = { /*TODO*/ }) {
@@ -68,29 +69,49 @@ fun Searchpage(viewModel: firestoreViewModel) {
             }
         }
 
+        Spacer(modifier = Modifier.height(5.dp))
 
         viewModel.getData()
         val userDetails by viewModel.userDetails.observeAsState(initial = emptyList())
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-
+            modifier = Modifier.fillMaxWidth().padding(top = 5.dp),
         ) {
             items(items = userDetails) {
                 UserOption(ItemName = it.name.toString())
             }
         }
-        TextButton(
-                onClick = { openDialog.value = true },
-        modifier = Modifier.size(90.dp)
-        ) {
-        Image(
-            imageVector = Icons.Default.AddCircle,
-            contentDescription = "",
-            modifier = Modifier
-                .size(80.dp)
-                .padding(5.dp)
-        )
+
+
     }
+    Column(
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.End,
+        modifier = Modifier
+            .padding(20.dp)
+            .fillMaxSize()
+    ) {
+        FloatingActionButton(
+            onClick = {  openDialog.value = true },
+            modifier = Modifier
+                .height(60.dp)
+                .width(150.dp),
+            shape = RoundedCornerShape(30),
+            backgroundColor = secondary90,
+            elevation = FloatingActionButtonDefaults.elevation(3.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                val direction = painterResource(id = R.drawable.directions)
+                Image(painter = direction, contentDescription = "")
+                Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                    text = "Add Route",
+                    color = Color.Black,
+                    fontFamily = FontFamily(nunito_sans),
+                    fontWeight = FontWeight.Bold,
+
+                    )
+            }
+        }
     }
 }
 
@@ -143,13 +164,51 @@ fun showAlertDailogue(openDialog: MutableState<Boolean>) {
 fun UserOption(
     ItemName: String
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth().height(30.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+
+    val nunito = Font(R.font.nunito_sans)
+
+    Box(
+        modifier = Modifier
+            .padding(vertical = 1.dp, horizontal = 10.dp)
+            .fillMaxWidth()
+            .height(70.dp)
+            .clip(RoundedCornerShape(20))
+            .background(primary100),
+    ) { Row(
+        modifier = Modifier.fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = ItemName)
-      }
+        Box(
+            contentAlignment = Alignment.Center
+        ) {
+           val red = Color(0xFFea4335)
+            val blue = Color(0xFF4285f4)
+            val green = Color(0xFF34a853)
+            val yellow = Color(0xFFfbbc05)
+            val colors = arrayOf(red,blue,green,yellow)
+            val color = colors.random()
+            Icon(
+                painter = painterResource(id = R.drawable.back_circle),
+                contentDescription = "",
+                tint = color,
+                modifier = Modifier
+                    .padding(start = 10.dp)
+
+            )
+            val gps = painterResource(id = R.drawable.gps)
+            Icon(painter = gps, contentDescription = "", tint = Color.White, modifier = Modifier.padding(start = 10.dp))
+        }
+        Text(
+            text = ItemName,
+            modifier = Modifier
+                .padding(start = 5.dp)
+                .weight(1f),
+            fontSize = 20.sp,
+            fontFamily = FontFamily(nunito),
+            textAlign = TextAlign.Start
+        )
+    }
+    }
 
 }
 
