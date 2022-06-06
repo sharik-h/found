@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,6 +30,7 @@ import com.example.found.R
 import com.example.found.data.firestoreViewModel
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import com.example.found.ui.theme.*
@@ -74,7 +77,9 @@ fun Searchpage(viewModel: firestoreViewModel) {
         viewModel.getData()
         val userDetails by viewModel.userDetails.observeAsState(initial = emptyList())
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().padding(top = 5.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 5.dp),
         ) {
             items(items = userDetails) {
                 UserOption(ItemName = it.name.toString())
@@ -117,6 +122,9 @@ fun Searchpage(viewModel: firestoreViewModel) {
 
 @Composable
 fun showAlertDailogue(openDialog: MutableState<Boolean>) {
+    val nunito_sans = Font(R.font.nunito_sans)
+    val nunito_bold = Font(R.font.nunito_sans_bold)
+
     var name by remember { mutableStateOf("") }
     var openDialog = openDialog
     val context = LocalContext.current
@@ -128,31 +136,46 @@ fun showAlertDailogue(openDialog: MutableState<Boolean>) {
                     if(name.length >= 1) {
                         context.startActivity(Intent(context, MapsActivity::class.java)
                             .putExtra("name",name))
-                        Log.d("name",name)
                         name = ""
                         openDialog.value = false
                     }
-
-                }) {
-                    Text(text = "Next")
+                },
+                    modifier = Modifier
+                        .height(40.dp)
+                        .width(95.dp),
+                    shape = RoundedCornerShape(30),
+                    colors = ButtonDefaults.buttonColors(secondary90),
+                    elevation = ButtonDefaults.elevation(0.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "",modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "Next", fontSize = 15.sp)
                 }
             },
             dismissButton = {
-                Button(onClick = {
+                TextButton(onClick = {
                     openDialog.value = false
                     name = ""
                 }) {
-                    Text(text = "Cancel")
+                    Icon(imageVector = Icons.Default.Close, contentDescription = "", modifier = Modifier.size(18.dp), tint = secondary10)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "Cancel", color = secondary10, fontSize = 15.sp)
                 }
             },
-            title = { Text(text = "Enter the name of location")},
+            title = {
+                Text(text = "Name the place", fontFamily = FontFamily(nunito_bold), fontSize = 18.sp, )
+                    },
             text = {
-                TextField(
+                OutlinedTextField(
                     value = name,
                     onValueChange = { it -> name = it },
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent,
-                    )
+                        focusedIndicatorColor = primary40,
+                        cursorColor = primary40
+                    ),
+                    textStyle = TextStyle(fontFamily = FontFamily(nunito_sans), fontSize = 18.sp),
+                    singleLine = true,
                 )
             }
         )
@@ -173,7 +196,7 @@ fun UserOption(
             .fillMaxWidth()
             .height(70.dp)
             .clip(RoundedCornerShape(20))
-            .background(primary100),
+            .background(secondary100),
     ) { Row(
         modifier = Modifier.fillMaxSize(),
         verticalAlignment = Alignment.CenterVertically
@@ -215,6 +238,7 @@ fun UserOption(
 @Preview(showBackground = true)
 @Composable
 fun prec() {
-//    Searchpage()
-    UserOption(ItemName = "sharikh")
+   // UserOption(ItemName = "sharikh")
+    val openDialog = remember { mutableStateOf(true)  }
+    showAlertDailogue(openDialog = openDialog)
 }
