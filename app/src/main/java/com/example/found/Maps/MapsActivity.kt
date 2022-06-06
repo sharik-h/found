@@ -99,6 +99,7 @@ class MapsActivity: ComponentActivity() {
                         Log.d("name",name)
 
                         val location = hashMapOf(
+                            "uid" to currentUid ,
                             "name" to name,
                             "latitude" to latitude,
                             "longitude" to longitude
