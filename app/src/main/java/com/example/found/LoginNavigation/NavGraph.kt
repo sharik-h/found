@@ -1,12 +1,13 @@
 package com.example.found.LoginNavigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModel
 
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.found.LoginPages.CreateAccount.EnterUserDetails
+import com.example.found.LoginPages.LoginWith.LoginWithMob
 import com.example.found.LoginPages.login.LoginOptions
 import com.example.found.SearchPage.Searchpage
 import com.example.found.SplashScreen.Splash
@@ -27,8 +28,11 @@ fun NavGraph(navHostController: NavHostController, viewModel: firestoreViewModel
         composable(route = Screen.loginOptions.route){
             LoginOptions(navHostController = navHostController  )
         }
-        composable(route = Screen.EnterUserDetails.route) {
+        composable(route = Screen.enterUserDetails.route) {
             EnterUserDetails(navHostController = navHostController)
+        }
+        composable(route = Screen.loginWithMobile.route) {
+            LoginWithMob()
         }
     }
 }

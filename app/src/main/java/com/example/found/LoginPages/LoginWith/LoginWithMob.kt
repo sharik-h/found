@@ -1,5 +1,6 @@
 package com.example.found.LoginPages.LoginWith
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,18 +12,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.found.LoginPages.Auth.Authenticate
 
 
 @Composable
 fun LoginWithMob() {
 
-    var name by remember{ mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
+    var phone by remember{ mutableStateOf("") }
+    val context = LocalContext.current
     Column(modifier = Modifier
         .fillMaxSize()
         .background(Color(0xFF78B3B3))
@@ -32,7 +34,7 @@ fun LoginWithMob() {
             contentPadding = PaddingValues(start = 0.dp, end = 10.dp, top = 10.dp),
             elevation = 0.dp,
         ) {
-            TextButton(onClick = { /*TODO*/ }) {
+            TextButton(onClick = {  }) {
                 Image(imageVector = Icons.Default.ArrowBack, contentDescription = "", colorFilter = ColorFilter.tint(
                     Color.White), modifier = Modifier.size(30.dp))
             }
@@ -41,7 +43,7 @@ fun LoginWithMob() {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = { context.startActivity(Intent(context, Authenticate::class.java).putExtra("phone",phone)) },
                     modifier = Modifier.height(50.dp).width(160.dp),
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
@@ -75,8 +77,8 @@ fun LoginWithMob() {
                 fontWeight = FontWeight.Bold
             )
             TextField(
-                value = name,
-                onValueChange = { it -> name = it },
+                value = phone,
+                onValueChange = { it -> phone = it },
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.Transparent,
                     focusedIndicatorColor = Color.White,

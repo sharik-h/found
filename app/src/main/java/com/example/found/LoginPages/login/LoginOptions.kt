@@ -103,7 +103,7 @@ fun LoginOptions(navHostController: NavHostController) {
                 fontFamily = FontFamily(nunito_sans),
                 modifier = Modifier
                     .clickable {
-
+                        navHostController.navigate(route = Screen.loginWithMobile.route)
                     },
             )
         }
