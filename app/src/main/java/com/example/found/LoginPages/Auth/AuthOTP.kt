@@ -10,23 +10,32 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusOrder
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.found.MainActivity
+import com.example.found.R
+import com.example.found.ui.theme.*
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential
@@ -38,6 +47,7 @@ import java.util.concurrent.TimeUnit
 class Authenticate: ComponentActivity() {
 
     lateinit var Sotp: String
+    var sendStatus = mutableStateOf(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,11 +82,13 @@ class Authenticate: ComponentActivity() {
                             "Verification Failed",
                             Toast.LENGTH_SHORT
                         ).show()
+                        sendStatus.value = -1
                     }
 
                     override fun onCodeSent(p0: String, p1: PhoneAuthProvider.ForceResendingToken) {
                         super.onCodeSent(p0, p1)
                         Sotp = p0
+                        sendStatus.value = 1
                         Toast.makeText(
                             applicationContext, "Verification Otp send successfully",
                             Toast.LENGTH_SHORT
@@ -95,7 +107,6 @@ class Authenticate: ComponentActivity() {
         FirebaseAuth.getInstance().signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Toast.makeText(applicationContext, "successfull", Toast.LENGTH_SHORT).show()
                     finishAffinity()
                     applicationContext.startActivity(Intent(applicationContext,MainActivity::class.java))
                 } else {
@@ -108,21 +119,23 @@ class Authenticate: ComponentActivity() {
     @Composable
     fun AuthOtp() {
         var otp by remember { mutableStateOf("") }
+        val nunitoBold = Font(R.font.nunito_sans_bold)
+        val nunitosans = Font(R.font.nunito_sans)
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF78B3B3))
+                .background(secondary95)
         ) {
             TopAppBar(
                 backgroundColor = Color.Transparent,
                 contentPadding = PaddingValues(start = 0.dp, end = 10.dp, top = 10.dp),
                 elevation = 0.dp,
             ) {
-                TextButton(onClick = { /*TODO*/ }) {
+                TextButton(onClick = { finish() }) {
                     Image(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "",
-                        colorFilter = ColorFilter.tint(Color.White),
+                        colorFilter = ColorFilter.tint(teritary40),
                         modifier = Modifier.size(30.dp)
                     )
                 }
@@ -133,17 +146,24 @@ class Authenticate: ComponentActivity() {
                     Button(
                         onClick = { SignInWithCred(otp = otp) },
                         modifier = Modifier
-                            .height(50.dp)
-                            .width(130.dp),
-                        shape = RoundedCornerShape(50),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
-                        elevation = ButtonDefaults.elevation(10.dp)
+                            .height(45.dp)
+                            .width(110.dp),
+                        shape = RoundedCornerShape(30),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = teritary40),
+                        elevation = ButtonDefaults.elevation(3.dp)
                     ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowForward,
+                            contentDescription = "",
+                            Modifier.size(20.dp),
+                            tint = teritary100
+                        )
                         Text(
-                            text = "VERIFY",
-                            color = Color(0xFF78B3B3),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
+                            text = "Verify",
+                            color = teritary100,
+                            fontSize = 15.sp,
+                            fontFamily = FontFamily(nunitoBold),
+                            modifier = Modifier.padding(start = 8.dp)
                         )
                     }
                 }
@@ -151,13 +171,64 @@ class Authenticate: ComponentActivity() {
             Column(verticalArrangement = Arrangement.spacedBy(15.dp)) {
                 Text(
                     text = "Enter OTP",
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    fontSize = 30.sp,
+                    fontFamily = FontFamily(nunitoBold),
+                    color = teritary40,
                     modifier = Modifier.padding(10.dp)
                 )
                 otpField() { getotp ->
                     otp = getotp
+                }
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 10.dp)) {
+
+                    if (sendStatus.value == 0) {
+                        Text(
+                            text = "Sending OTP",
+                            fontSize = 14.sp,
+                            fontFamily = FontFamily(nunitosans)
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .padding(top = 2.dp)
+                                .height(16.dp)
+                                .width(16.dp),
+                            strokeWidth = 2.dp,
+                            color = dimblue
+                        )
+                    }else if(sendStatus.value == -1) {
+                        Text(
+                            text = "Sending OTP failed",
+                            fontSize = 14.sp,
+                            fontFamily = FontFamily(nunitosans)
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .padding(top = 2.dp)
+                                .width(16.dp)
+                                .height(16.dp),
+                            tint = dimred
+                        )
+                    }else if (sendStatus.value == 1){
+                        Text(
+                            text = "OTP send",
+                            fontSize = 14.sp,
+                            fontFamily = FontFamily(nunitosans)
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .padding(top = 2.dp)
+                                .width(16.dp)
+                                .height(16.dp),
+                            tint = dimgreen
+                        )
+                    }
                 }
             }
         }
@@ -168,6 +239,7 @@ class Authenticate: ComponentActivity() {
     fun otpField(
         onFilled: (code: String) -> Unit
     ) {
+        val nunitoBold = Font(R.font.nunito_sans_bold)
         var otp: List<Char> by remember { mutableStateOf(listOf()) }
         val focusRequesters: List<FocusRequester> = remember {
             val temp = mutableListOf<FocusRequester>()
@@ -178,7 +250,6 @@ class Authenticate: ComponentActivity() {
         }
         Row(
             modifier = Modifier
-//            .height(60.dp)
                 .fillMaxWidth()
                 .padding(top = 10.dp),
             horizontalArrangement = Arrangement.Center
@@ -186,9 +257,9 @@ class Authenticate: ComponentActivity() {
             (0 until 6).forEach { index ->
                 TextField(
                     textStyle = TextStyle(
-                        color = Color.White,
+                        color = teritary40,
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
+                        fontFamily = FontFamily(nunitoBold)
                     ),
                     modifier = Modifier
                         .width(45.dp)
@@ -198,9 +269,10 @@ class Authenticate: ComponentActivity() {
                     singleLine = true,
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent,
-                        focusedIndicatorColor = Color.White,
-                        unfocusedIndicatorColor = Color.White,
-                        textColor = Color.White
+                        focusedIndicatorColor = teritary40,
+                        unfocusedIndicatorColor = teritary40,
+                        textColor = teritary40,
+                        cursorColor = teritary40
                     ),
                     value = otp.getOrNull(index = index)?.takeIf {
                         it.isDigit()
@@ -231,11 +303,13 @@ class Authenticate: ComponentActivity() {
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Next
-                    )
+                    ),
                 )
                 Spacer(modifier = Modifier.width(15.dp))
             }
         }
     }
 }
+
+
 
