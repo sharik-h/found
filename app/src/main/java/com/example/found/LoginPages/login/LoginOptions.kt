@@ -59,7 +59,7 @@ fun LoginOptions(navHostController: NavHostController) {
             modifier = Modifier.padding(vertical = 15.dp)
         ) {
             Button(
-                onClick = { navHostController.navigate(route = Screen.enterUserDetails.route) },
+                onClick = { navHostController.navigate(route = Screen.loginWithMobile.route) },
                 modifier = Modifier
                     .width(100.dp)
                     .height(45.dp)
@@ -103,7 +103,7 @@ fun LoginOptions(navHostController: NavHostController) {
                 fontFamily = FontFamily(nunito_sans),
                 modifier = Modifier
                     .clickable {
-                        navHostController.navigate(route = Screen.loginWithMobile.route)
+                        navHostController.navigate(route = Screen.enterUserDetails.route)
                     },
             )
         }
