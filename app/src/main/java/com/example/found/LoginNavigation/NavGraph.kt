@@ -1,6 +1,5 @@
 package com.example.found.LoginNavigation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 
 import androidx.navigation.NavHostController
@@ -32,7 +31,7 @@ fun NavGraph(navHostController: NavHostController, viewModel: firestoreViewModel
             EnterUserDetails(navHostController = navHostController)
         }
         composable(route = Screen.loginWithMobile.route) {
-            LoginWithMob()
+            LoginWithMob(navHostController = navHostController)
         }
     }
 }
