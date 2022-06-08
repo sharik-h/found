@@ -69,19 +69,10 @@ class Authenticate: ComponentActivity() {
             .setCallbacks(
                 object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                     override fun onVerificationCompleted(p0: PhoneAuthCredential) {
-                        Toast.makeText(
-                            applicationContext,
-                            "Verification Successfull",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(applicationContext, "Verified", Toast.LENGTH_SHORT).show()
                     }
 
                     override fun onVerificationFailed(p0: FirebaseException) {
-                        Toast.makeText(
-                            applicationContext,
-                            "Verification Failed",
-                            Toast.LENGTH_SHORT
-                        ).show()
                         sendStatus.value = -1
                     }
 
@@ -89,10 +80,6 @@ class Authenticate: ComponentActivity() {
                         super.onCodeSent(p0, p1)
                         Sotp = p0
                         sendStatus.value = 1
-                        Toast.makeText(
-                            applicationContext, "Verification Otp send successfully",
-                            Toast.LENGTH_SHORT
-                        ).show()
                     }
                 })
             .build()
@@ -102,13 +89,11 @@ class Authenticate: ComponentActivity() {
 
     fun SignInWithCred(otp: String) {
         val credential = PhoneAuthProvider.getCredential(Sotp, otp)
-        Log.d("otp =",otp)
-        Log.d("sotp =",Sotp)
         FirebaseAuth.getInstance().signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     finishAffinity()
-                    applicationContext.startActivity(Intent(applicationContext,MainActivity::class.java))
+                    this.startActivity(Intent(this,MainActivity::class.java))
                 } else {
                     Toast.makeText(applicationContext, "failed", Toast.LENGTH_SHORT).show()
                 }
