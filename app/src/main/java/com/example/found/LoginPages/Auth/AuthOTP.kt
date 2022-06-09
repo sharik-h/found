@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -161,10 +162,26 @@ class Authenticate: ComponentActivity() {
                     color = teritary40,
                     modifier = Modifier.padding(10.dp)
                 )
-                otpField() { getotp ->
-                    otp = getotp
-                }
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 10.dp)) {
+                TextField(
+                    value = otp,
+                    onValueChange = {  otp = it },
+                    modifier = Modifier.padding(start = 10.dp).width(160.dp),
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent,
+                        focusedIndicatorColor = teritary40,
+                        unfocusedIndicatorColor = teritary40,
+                        cursorColor = teritary40,
+                        textColor = teritary40
+                    ),
+                    textStyle = TextStyle(fontSize = 20.sp, fontFamily = FontFamily(nunitosans)),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            SignInWithCred(otp = otp)
+                        }
+                    )
+                )
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
 
                     if (sendStatus.value == 0) {
                         Text(
@@ -215,82 +232,6 @@ class Authenticate: ComponentActivity() {
                         )
                     }
                 }
-            }
-        }
-    }
-
-
-    @Composable
-    fun otpField(
-        onFilled: (code: String) -> Unit
-    ) {
-        val nunitoBold = Font(R.font.nunito_sans_bold)
-        var otp: List<Char> by remember { mutableStateOf(listOf()) }
-        val focusRequesters: List<FocusRequester> = remember {
-            val temp = mutableListOf<FocusRequester>()
-            repeat(6) {
-                temp.add(FocusRequester())
-            }
-            temp
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            (0 until 6).forEach { index ->
-                TextField(
-                    textStyle = TextStyle(
-                        color = teritary40,
-                        fontSize = 20.sp,
-                        fontFamily = FontFamily(nunitoBold)
-                    ),
-                    modifier = Modifier
-                        .width(45.dp)
-                        .focusOrder(focusRequester = focusRequesters[index]) {
-                            focusRequesters[index + 1].requestFocus()
-                        },
-                    singleLine = true,
-                    colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.Transparent,
-                        focusedIndicatorColor = teritary40,
-                        unfocusedIndicatorColor = teritary40,
-                        textColor = teritary40,
-                        cursorColor = teritary40
-                    ),
-                    value = otp.getOrNull(index = index)?.takeIf {
-                        it.isDigit()
-                    }?.toString() ?: "",
-                    onValueChange = { value: String ->
-                        if (focusRequesters[index].freeFocus()) {
-                            val temp = otp.toMutableList()
-                            if (value == "") {
-                                if (temp.size > index) {
-                                    temp.removeAt(index = index)
-                                    otp = temp
-                                    focusRequesters.getOrNull(index - 1)?.requestFocus()
-                                }
-                            } else {
-                                if (otp.size > index) {
-                                    temp[index] = value.getOrNull(0) ?: ' '
-                                } else {
-                                    temp.add(value.getOrNull(0) ?: ' ')
-                                    otp = temp
-                                    focusRequesters.getOrNull(index + 1)?.requestFocus()
-                                        ?: onFilled(
-                                            otp.joinToString(separator = "")
-                                        )
-                                }
-                            }
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Next
-                    ),
-                )
-                Spacer(modifier = Modifier.width(15.dp))
             }
         }
     }
