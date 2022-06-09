@@ -27,6 +27,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ktx.FirebaseFirestoreKtxRegistrar
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -85,24 +86,21 @@ class MapsActivity: ComponentActivity() {
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPosition
         ) {
-            Marker(
+            Marker (
                 position = cordinates,
                 title = "Save this Spot",
                 snippet = "Click this box to save this location",
                 draggable = true,
                 markerDragState = markerState,
                 onInfoWindowClick = {
-                    latitude = it.position.latitude.toString()
-                    longitude = it.position.longitude.toString()
-
+                    val geoPoint = GeoPoint(it.position.latitude,  it.position.longitude)
                     if (name != null){
                         Log.d("name",name)
 
                         val location = hashMapOf(
                             "uid" to currentUid ,
                             "name" to name,
-                            "latitude" to latitude,
-                            "longitude" to longitude
+                            "cordinates" to geoPoint
                         )
                         database
                             .collection("found/locations/$currentUid")
@@ -115,7 +113,7 @@ class MapsActivity: ComponentActivity() {
                         finish()
                     }
 
-                }
+                },
             )
         }
     }
