@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 import com.example.found.LoginPages.CreateAccount.EnterUserDetails
 import com.example.found.LoginPages.LoginWith.LoginWithMob
 import com.example.found.LoginPages.login.LoginOptions
-import com.example.found.SearchPage.Searchpage
+import com.example.found.SearchPage.LocationListPage
 import com.example.found.SplashScreen.Splash
 import com.example.found.data.firestoreViewModel
 
@@ -22,7 +22,7 @@ fun NavGraph(navHostController: NavHostController, viewModel: firestoreViewModel
             Splash(navHostController = navHostController)
         }
         composable(route = Screen.search.route){
-            Searchpage(viewModel = viewModel)
+            LocationListPage(viewModel = viewModel)
         }
         composable(route = Screen.loginOptions.route){
             LoginOptions(navHostController = navHostController  )

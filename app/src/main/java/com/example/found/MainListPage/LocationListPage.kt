@@ -39,7 +39,7 @@ import com.google.firebase.firestore.GeoPoint
 
 
 @Composable
-fun Searchpage(viewModel: firestoreViewModel) {
+fun LocationListPage(viewModel: firestoreViewModel) {
     val openDialog = remember { mutableStateOf(false)  }
     showAlertDailogue(openDialog = openDialog)
 
