@@ -1,9 +1,10 @@
 package com.example.found.SearchPage
 
 import android.content.Intent
-import android.util.Log
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import com.example.found.ui.theme.*
+import com.google.firebase.firestore.GeoPoint
 
 
 @Composable
@@ -82,11 +84,11 @@ fun Searchpage(viewModel: firestoreViewModel) {
                 .padding(top = 5.dp),
         ) {
             items(items = userDetails) {
-                UserOption(ItemName = it.name.toString())
+                it.cordinates?.let { it1 ->
+                    UserOption(ItemName = it.name.toString(), cordinates = it1)
+                }
             }
         }
-
-
     }
     Column(
         verticalArrangement = Arrangement.Bottom,
@@ -185,18 +187,25 @@ fun showAlertDailogue(openDialog: MutableState<Boolean>) {
 
 @Composable
 fun UserOption(
-    ItemName: String
+    ItemName: String,
+    cordinates : GeoPoint
 ) {
-
     val nunito = Font(R.font.nunito_sans)
-
+    val context = LocalContext.current
+    val mapInent: Intent = Uri.parse("google.navigation:q=${cordinates.latitude},${cordinates.longitude}")
+        .let { location ->
+            Intent(Intent.ACTION_VIEW, location)
+        }
     Box(
         modifier = Modifier
             .padding(vertical = 1.dp, horizontal = 10.dp)
             .fillMaxWidth()
             .height(70.dp)
             .clip(RoundedCornerShape(20))
-            .background(secondary100),
+            .background(secondary100)
+            .clickable {
+                context.startActivity(mapInent)
+            },
     ) { Row(
         modifier = Modifier.fillMaxSize(),
         verticalAlignment = Alignment.CenterVertically
