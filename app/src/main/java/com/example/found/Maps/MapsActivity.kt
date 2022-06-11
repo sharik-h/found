@@ -9,6 +9,7 @@ import android.location.Location
 import android.media.MediaParser.SeekPoint.START
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -73,12 +74,21 @@ class MapsActivity: ComponentActivity() {
     fun SpecimenMap() {
         val currentUid = FirebaseAuth.getInstance().currentUser!!.uid
         val database = Firebase.firestore
-        val name = intent.getStringExtra("name")
-
         var latitude by remember { mutableStateOf("") }
         var longitude by remember { mutableStateOf("") }
+        var cordinates  by remember { mutableStateOf( LatLng(currentLocation.latitude,currentLocation.longitude))}
+        val name = intent.getStringExtra("name")
+        val id = intent.getStringExtra("id")
+        val lat = intent.getStringExtra("latitude")
+        val long = intent.getStringExtra("longitude")
+
+
+
         var markerState = rememberMarkerDragState()
-        var cordinates  by remember { mutableStateOf( LatLng(currentLocation.latitude,currentLocation.longitude) )}
+        if (!id.isNullOrEmpty()){
+             cordinates  =  LatLng(lat!!.toDouble(),long!!.toDouble())
+        }
+
         var cameraPosition = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(cordinates,15f)
         }
@@ -93,26 +103,30 @@ class MapsActivity: ComponentActivity() {
                 draggable = true,
                 markerDragState = markerState,
                 onInfoWindowClick = {
-                    val geoPoint = GeoPoint(it.position.latitude,  it.position.longitude)
-                    if (name != null){
-                        Log.d("name",name)
+                        val geoPoint = GeoPoint(it.position.latitude,  it.position.longitude)
+                        if (name != null) {
+                            Log.d("name", name)
 
-                        val location = hashMapOf(
-                            "uid" to currentUid ,
-                            "name" to name,
-                            "cordinates" to geoPoint
-                        )
-                        database
-                            .collection("found/locations/$currentUid")
-                            .add(location)
-                            .addOnSuccessListener {
-                                Log.d("dataStatus","data added successfully")
-                            }.addOnFailureListener{
-                                Log.d("dataStatus","Something went wrong",it)
-                            }
-                        finish()
-                    }
-
+                            val location = hashMapOf(
+                                "uid" to currentUid,
+                                "name" to name,
+                                "cordinates" to geoPoint
+                            )
+                            database
+                                .collection("found/locations/$currentUid")
+                                .add(location)
+                                .addOnSuccessListener {
+                                    Log.d("dataStatus", "data added successfully")
+                                }.addOnFailureListener {
+                                    Log.d("dataStatus", "Something went wrong", it)
+                                }
+                        }else{
+                            database
+                                .collection("found/locations/$currentUid")
+                                .document(id.toString())
+                                .update("cordinates",geoPoint)
+                        }
+                    finish()
                 },
             )
         }

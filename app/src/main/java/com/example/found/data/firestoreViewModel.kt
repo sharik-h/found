@@ -25,6 +25,7 @@ class firestoreViewModel: ViewModel() {
                     var inLocation = ArrayList<documentFormat>()
                     documents.forEach{
                         var location = it.toObject(documentFormat::class.java)
+                        location!!.id = it.id
                         location?.let {
                             inLocation.add(location)
                         }

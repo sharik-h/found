@@ -2,6 +2,7 @@ package com.example.found.SearchPage
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,6 +14,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,17 +33,22 @@ import com.example.found.R
 import com.example.found.data.firestoreViewModel
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import com.example.found.ui.theme.*
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 
 @Composable
 fun LocationListPage(viewModel: firestoreViewModel) {
     val openDialog = remember { mutableStateOf(false)  }
-    showAlertDailogue(openDialog = openDialog)
+    addAlertDailod(openDialog = openDialog, )
 
     val nunito_sans = Font(R.font.nunito_sans)
     val nunito_bold = Font(R.font.nunito_sans_bold)
@@ -85,7 +92,7 @@ fun LocationListPage(viewModel: firestoreViewModel) {
         ) {
             items(items = userDetails) {
                 it.cordinates?.let { it1 ->
-                    UserOption(ItemName = it.name.toString(), cordinates = it1)
+                    UserOption(ItemName = it.name.toString(), cordinates = it1, id = it.id)
                 }
             }
         }
@@ -123,21 +130,34 @@ fun LocationListPage(viewModel: firestoreViewModel) {
 }
 
 @Composable
-fun showAlertDailogue(openDialog: MutableState<Boolean>) {
+fun addAlertDailod(
+    openDialog: MutableState<Boolean>,
+    id: String? = null
+) {
     val nunito_sans = Font(R.font.nunito_sans)
     val nunito_bold = Font(R.font.nunito_sans_bold)
-
     var name by remember { mutableStateOf("") }
     var openDialog = openDialog
     val context = LocalContext.current
+    val database = Firebase.firestore
+    val currentUid = FirebaseAuth.getInstance().currentUser!!.uid
+
+
     if (openDialog.value){
         AlertDialog(
-            onDismissRequest = { /*TODO*/ },
+            onDismissRequest = { openDialog.value = false },
             confirmButton = {
                 Button(onClick = {
                     if(name.length >= 1) {
-                        context.startActivity(Intent(context, MapsActivity::class.java)
-                            .putExtra("name",name))
+                        if (id.isNullOrEmpty()) {
+                            context.startActivity(Intent(context, MapsActivity::class.java)
+                                .putExtra("name",name))
+                        }else {
+                            database
+                                .collection("found/locations/$currentUid")
+                                .document(id)
+                                .update("name",name)
+                        }
                         name = ""
                         openDialog.value = false
                     }
@@ -151,7 +171,15 @@ fun showAlertDailogue(openDialog: MutableState<Boolean>) {
                 ) {
                     Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "",modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "Next", fontSize = 15.sp)
+                    Text(
+                        text =
+                        if (id.isNullOrEmpty()) {
+                            "Next"
+                        } else {
+                            "Save"
+                        },
+                        fontFamily = FontFamily(nunito_bold)
+                    )
                 }
             },
             dismissButton = {
@@ -165,7 +193,16 @@ fun showAlertDailogue(openDialog: MutableState<Boolean>) {
                 }
             },
             title = {
-                Text(text = "Name the place", fontFamily = FontFamily(nunito_bold), fontSize = 18.sp, )
+                Text(
+                    text =
+                    if (id.isNullOrEmpty()) {
+                        "Name the place"
+                    } else {
+                        "Re-name the place"
+                           },
+                    fontFamily = FontFamily(nunito_bold),
+                    fontSize = 18.sp,
+                )
                     },
             text = {
                 OutlinedTextField(
@@ -185,11 +222,85 @@ fun showAlertDailogue(openDialog: MutableState<Boolean>) {
 
 }
 
+
+@Composable
+fun deleteAlertDailog(
+    openDailog: MutableState<Boolean>,
+    id: String?
+) {
+    val nunito_sans = Font(R.font.nunito_sans)
+    var openDialog = openDailog
+    val database = Firebase.firestore
+    val currentUid = FirebaseAuth.getInstance().currentUser!!.uid
+
+    if (openDailog.value) {
+        AlertDialog(
+            onDismissRequest = { openDailog.value = false },
+            title = {
+                Text(
+                    text = "Delete",
+                    fontFamily = FontFamily(nunito_sans)
+                )
+            },
+            text = {
+                Text(
+                    text = "Are you sure you want to delete this location.",
+                    fontFamily = FontFamily(nunito_sans)
+                )
+            },
+            confirmButton = {
+                Button(onClick = {
+                    database
+                        .collection("found/locations/$currentUid")
+                        .document(id.toString())
+                        .delete()
+                    openDialog.value = false
+                },
+                    modifier = Modifier.height(40.dp),
+                    shape = RoundedCornerShape(30),
+                    colors = ButtonDefaults.buttonColors(dimred),
+                    elevation = ButtonDefaults.elevation(0.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "",
+                        modifier = Modifier.size(18.dp),
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Delete",
+                        fontSize = 15.sp,
+                        color = Color.White
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    openDialog.value = false
+                }) {
+                    Icon(imageVector = Icons.Default.Close, contentDescription = "", modifier = Modifier.size(18.dp), tint = secondary10)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "Cancel", color = secondary10, fontSize = 15.sp)
+                }
+            }
+        )
+    }
+}
+
+
 @Composable
 fun UserOption(
     ItemName: String,
-    cordinates : GeoPoint
+    cordinates : GeoPoint,
+    id: String?
 ) {
+    val openAddDialog = remember { mutableStateOf(false)  }
+    val openDeleteDailog = remember{ mutableStateOf(false)}
+    addAlertDailod(openDialog = openAddDialog, id= id)
+    deleteAlertDailog(openDailog = openDeleteDailog, id = id)
+
+    var expanded by remember { mutableStateOf(false)}
     val nunito = Font(R.font.nunito_sans)
     val context = LocalContext.current
     val mapInent: Intent = Uri.parse("google.navigation:q=${cordinates.latitude},${cordinates.longitude}")
@@ -206,48 +317,127 @@ fun UserOption(
             .clickable {
                 context.startActivity(mapInent)
             },
-    ) { Row(
-        modifier = Modifier.fillMaxSize(),
-        verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            contentAlignment = Alignment.Center
+        Row(
+            modifier = Modifier.fillMaxSize()
         ) {
-           val red = Color(0xFFea4335)
-            val blue = Color(0xFF4285f4)
-            val green = Color(0xFF34a853)
-            val yellow = Color(0xFFfbbc05)
-            val colors = arrayOf(red,blue,green,yellow)
-            val color = colors.random()
-            Icon(
-                painter = painterResource(id = R.drawable.back_circle),
-                contentDescription = "",
-                tint = color,
+            Row(
                 modifier = Modifier
-                    .padding(start = 10.dp)
+                    .weight(0.9f)
+                    .fillMaxHeight(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    val red = Color(0xFFea4335)
+                    val blue = Color(0xFF4285f4)
+                    val green = Color(0xFF34a853)
+                    val yellow = Color(0xFFfbbc05)
+                    val colors = arrayOf(red, blue, green, yellow)
+                    val color = colors.random()
+                    Icon(
+                        painter = painterResource(id = R.drawable.back_circle),
+                        contentDescription = "",
+                        tint = color,
+                        modifier = Modifier.padding(start = 10.dp)
+                    )
+                    val gps = painterResource(id = R.drawable.gps)
+                    Icon(
+                        painter = gps,
+                        contentDescription = "",
+                        tint = Color.White,
+                        modifier = Modifier.padding(start = 10.dp)
+                    )
+                }
+                Text(
+                    text = ItemName,
+                    modifier = Modifier
+                        .padding(start = 5.dp)
+                        .weight(1f),
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily(nunito),
+                    textAlign = TextAlign.Start
+                )
+            }
+            IconButton(onClick = { expanded = true }) {
+                Image(
+                    painter = painterResource(id = R.drawable.options_icon),
+                    contentDescription = "",
+                    colorFilter = ColorFilter.tint(secondary90),
+                    modifier = Modifier.weight(0.1f),
+                )
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                ) {
+                TextButton(
+                    onClick = {
+                        expanded = false
+                        openAddDialog.value = true
+                    },
+                    modifier = Modifier.width(116.dp),
 
-            )
-            val gps = painterResource(id = R.drawable.gps)
-            Icon(painter = gps, contentDescription = "", tint = Color.White, modifier = Modifier.padding(start = 10.dp))
-        }
-        Text(
-            text = ItemName,
-            modifier = Modifier
-                .padding(start = 5.dp)
-                .weight(1f),
-            fontSize = 20.sp,
-            fontFamily = FontFamily(nunito),
-            textAlign = TextAlign.Start
-        )
+                ) {
+                    Text(
+                        text = "Edit name",
+                        fontFamily = FontFamily(nunito),
+                        fontSize = 15.sp,
+                        color = Color.Black,
+                        textAlign = TextAlign.Left,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                TextButton(
+                    onClick = {
+                        expanded = false
+                        context.startActivity(Intent(context, MapsActivity::class.java)
+                            .putExtra("id",id)
+                            .putExtra("latitude",cordinates.latitude.toString())
+                            .putExtra("longitude",cordinates.longitude.toString())
+                        )
+                    }
+                ) {
+                    Text(
+                        text = "Edit location",
+                        fontFamily = FontFamily(nunito),
+                        fontSize = 15.sp,
+                        color = Color.Black
+                    )
+                }
+                Divider(thickness = 0.5.dp)
+                TextButton(
+                    onClick = {
+                        expanded = false
+                        openDeleteDailog.value = true
+                    },
+                    modifier = Modifier.width(116.dp),
+
+                ) {
+                    Text(
+                        text = "Delete",
+                        fontFamily = FontFamily(nunito),
+                        fontSize = 15.sp,
+                        color = Color.Red,
+                        textAlign = TextAlign.Left,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+            }
+//        }
+
+
     }
     }
-
 }
 
 @Preview(showBackground = true)
 @Composable
 fun prec() {
-   // UserOption(ItemName = "sharikh")
-    val openDialog = remember { mutableStateOf(true)  }
-    showAlertDailogue(openDialog = openDialog)
+    val geoPoint = GeoPoint(12.00,34.99)
+//    UserOption(ItemName = "sharikh", cordinates = geoPoint)
+//    val openDialog = remember { mutableStateOf(true)  }
+//    showAlertDailogue(openDialog = openDialog)
 }
