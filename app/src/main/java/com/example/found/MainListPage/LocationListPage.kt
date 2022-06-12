@@ -3,9 +3,11 @@ package com.example.found.SearchPage
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -37,6 +39,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -71,7 +74,7 @@ fun LocationListPage(viewModel: firestoreViewModel) {
         ) {
             TextButton(onClick = { isSearchVisible = !isSearchVisible } )
             {
-                Image(imageVector = Icons.Default.Search, contentDescription = "", modifier = Modifier.size(35.dp) )
+                Image(imageVector = Icons.Default.Search, contentDescription = "", modifier = Modifier.size(30.dp) )
             }
             Text(
                 text = "Found",
@@ -89,44 +92,54 @@ fun LocationListPage(viewModel: firestoreViewModel) {
 
 
         if (isSearchVisible) {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(secondary90)
-                    .padding(10.dp),
-            ) {
-                OutlinedTextField(
-                    value = search,
-                    onValueChange = {  search = it },
-                    shape = RoundedCornerShape(30),
-                    textStyle = TextStyle(fontFamily = FontFamily(nunito_sans)),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            Box() {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
                     modifier = Modifier
-                        .height(40.dp)
-                        .weight(0.8f)
-                        .clip(RoundedCornerShape(30))
-                        .background(Color.White),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        cursorColor = Color.Black,
-                        focusedBorderColor = Color.Transparent,
-                        unfocusedBorderColor = Color.Transparent,
-                    ),
-                    trailingIcon = {
-                        IconButton(onClick = { search = "" }) {
-                            Icon(
-                                painter = circularClose,
-                                contentDescription = ""
-                            )
-                        }
-                    },
-                )
-                TextButton(onClick = { isSearchVisible = false }) {
-                    Text(
-                        text = "Cancel",
-                        fontFamily = FontFamily(nunito_bold),
-                        color = Color.Black
+                        .fillMaxWidth()
+                        .background(secondary90)
+                        .padding(10.dp),
+                ) {
+                    BasicTextField(
+                        value = search,
+                        onValueChange = { search = it },
+                        singleLine = true,
+                        textStyle = TextStyle(
+                            fontFamily = FontFamily(nunito_sans),
+                            fontSize = 20.sp,
+                            color = Color.DarkGray
+                        ),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                        modifier = Modifier
+                            .height(40.dp)
+                            .weight(0.8f)
+                            .clip(RoundedCornerShape(30))
+                            .background(color = Color.White)
+                            .padding(top = 5.dp, start = 8.dp),
                     )
+                    TextButton(onClick = { isSearchVisible = false }) {
+                        Text(
+                            text = "Cancel",
+                            fontFamily = FontFamily(nunito_bold),
+                            color = Color.DarkGray
+                        )
+                    }
+
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp),
+                ){
+                    Spacer(modifier = Modifier.weight(0.65f))
+                    Icon(
+                        painter = circularClose,
+                        contentDescription = "",
+                        tint = Color.DarkGray,
+                        modifier = Modifier.clickable( indication = null, interactionSource = MutableInteractionSource()) { search = ""}
+                    )
+                    Spacer(modifier = Modifier.weight(0.21f))
                 }
             }
         }
