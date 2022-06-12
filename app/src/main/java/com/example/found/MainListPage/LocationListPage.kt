@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
@@ -38,6 +40,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.ImeAction
 import com.example.found.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
@@ -48,10 +51,13 @@ import com.google.firebase.ktx.Firebase
 @Composable
 fun LocationListPage(viewModel: firestoreViewModel) {
     val openDialog = remember { mutableStateOf(false)  }
-    addAlertDailod(openDialog = openDialog, )
+    var isSearchVisible by remember { mutableStateOf(false)  }
+    var search by remember { mutableStateOf("") }
+    addAlertDailod(openDialog = openDialog )
 
     val nunito_sans = Font(R.font.nunito_sans)
     val nunito_bold = Font(R.font.nunito_sans_bold)
+    val circularClose = painterResource(id = R.drawable.circle_close)
 
     Column(
         modifier = Modifier
@@ -63,7 +69,7 @@ fun LocationListPage(viewModel: firestoreViewModel) {
             elevation = 0.5.dp,
             contentPadding = PaddingValues(start = 0.dp, end = 0.dp)
         ) {
-            TextButton(onClick = { /*TODO*/ } )
+            TextButton(onClick = { isSearchVisible = !isSearchVisible } )
             {
                 Image(imageVector = Icons.Default.Search, contentDescription = "", modifier = Modifier.size(35.dp) )
             }
@@ -81,21 +87,70 @@ fun LocationListPage(viewModel: firestoreViewModel) {
             }
         }
 
-        Spacer(modifier = Modifier.height(5.dp))
 
-        viewModel.getData()
-        val userDetails by viewModel.userDetails.observeAsState(initial = emptyList())
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 5.dp),
-        ) {
-            items(items = userDetails) {
-                it.cordinates?.let { it1 ->
-                    UserOption(ItemName = it.name.toString(), cordinates = it1, id = it.id)
+        if (isSearchVisible) {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(secondary90)
+                    .padding(10.dp),
+            ) {
+                OutlinedTextField(
+                    value = search,
+                    onValueChange = {  search = it },
+                    shape = RoundedCornerShape(30),
+                    textStyle = TextStyle(fontFamily = FontFamily(nunito_sans)),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    modifier = Modifier
+                        .height(40.dp)
+                        .weight(0.8f)
+                        .clip(RoundedCornerShape(30))
+                        .background(Color.White),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        cursorColor = Color.Black,
+                        focusedBorderColor = Color.Transparent,
+                        unfocusedBorderColor = Color.Transparent,
+                    ),
+                    trailingIcon = {
+                        IconButton(onClick = { search = "" }) {
+                            Icon(
+                                painter = circularClose,
+                                contentDescription = ""
+                            )
+                        }
+                    },
+                )
+                TextButton(onClick = { isSearchVisible = false }) {
+                    Text(
+                        text = "Cancel",
+                        fontFamily = FontFamily(nunito_bold),
+                        color = Color.Black
+                    )
                 }
             }
         }
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+        if(search.isNotEmpty()){
+            viewModel.searchData(search)
+        }else{
+            viewModel.getData()
+        }
+            val userDetails by viewModel.userDetails.observeAsState(initial = emptyList())
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 5.dp),
+            ) {
+                items(items = userDetails) {
+                    it.cordinates?.let { it1 ->
+                        UserOption(ItemName = it.name.toString(), cordinates = it1, id = it.id)
+                    }
+                }
+            }
+
     }
     Column(
         verticalArrangement = Arrangement.Bottom,
@@ -117,18 +172,18 @@ fun LocationListPage(viewModel: firestoreViewModel) {
                 val direction = painterResource(id = R.drawable.directions)
                 Image(painter = direction, contentDescription = "")
                 Spacer(modifier = Modifier.width(8.dp))
-                    Text(
+                Text(
                     text = "Add Route",
                     color = Color.Black,
                     fontFamily = FontFamily(nunito_sans),
                     fontWeight = FontWeight.Bold,
-
-                    )
+                )
             }
         }
     }
 }
 
+// Alert dailog that help in giving name and renaming the data or a new location
 @Composable
 fun addAlertDailod(
     openDialog: MutableState<Boolean>,
@@ -222,7 +277,7 @@ fun addAlertDailod(
 
 }
 
-
+// Alert dailog that confirms the deletion of a data
 @Composable
 fun deleteAlertDailog(
     openDailog: MutableState<Boolean>,
@@ -288,7 +343,7 @@ fun deleteAlertDailog(
     }
 }
 
-
+// Sample or model of item used in lazycolumn
 @Composable
 fun UserOption(
     ItemName: String,
@@ -431,13 +486,4 @@ fun UserOption(
 
     }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun prec() {
-    val geoPoint = GeoPoint(12.00,34.99)
-//    UserOption(ItemName = "sharikh", cordinates = geoPoint)
-//    val openDialog = remember { mutableStateOf(true)  }
-//    showAlertDailogue(openDialog = openDialog)
 }
