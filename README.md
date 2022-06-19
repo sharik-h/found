@@ -25,6 +25,7 @@
 * This application is mainly used for storing the locations and finding the route to the location within a  number of clicks.
 
 ### What all does this application uses ? ###
+* This application is made using kotlin language with the help of jetpack compose .
 * This application uses Firebase Phone Authentication as well as Google sign-In method to create a new account or login into the application.
-* This application stores all data into google cloud firestore database, Thus we can get the location from where ever you want just by logging into your account.
+* This application stores all data into google cloud firestore database, Thus we can get all the saved location from where ever you want just by logging into your account.
 * This application also used google maps SDK to bring up a maps page with a marker placed at their current location so that users can easily find location near them while they are trying to save a location. 
